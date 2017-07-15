@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-path = './image/origin/100_01/data/'
+path = './image/origin/001_00/data/'
 
 
 def rename():
@@ -55,7 +55,8 @@ def resize_img():
 
 
 def rotate_img():
-    for r, ds, fs in os.walk('image/origin/100_01'):
+    for r, ds, fs in os.walk('./image/origin/500_00/'):
+        if (len(ds) == 0): return
         for f in fs:
             filename = os.path.join(r, f)
             img = cv2.imread(filename, cv2.IMREAD_COLOR)
@@ -68,7 +69,8 @@ def rotate_img():
                 r_img = cv2.warpAffine(
                     img, rotation_matrix, size, flags=cv2.INTER_CUBIC)
                 f1, f2 = os.path.splitext(filename)
-                savename = '{0}/data/{1}_{2:03d}{3}'.format(r, os.path.split(f1)[1], int(angle), f2)
+                savename = '{0}/data/{1}_{2:03d}{3}'.format(
+                    r, os.path.split(f1)[1], int(angle), f2)
                 cv2.imwrite(savename, r_img)
 
 

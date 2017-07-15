@@ -15,9 +15,14 @@ from skimage.transform import rescale
 
 
 def load_data(dirname):
-    dirs = ['010_00', '010_01', '100_00', '100_01']
+    dirs = ['001_00', '001_01',
+            '005_00', '005_01',
+            '010_00', '010_01',
+            '050_00', '050_01',
+            '100_00', '100_01',
+            '500_00', '500_01']
 
-    IMAGE_SIZE = 64
+    IMAGE_SIZE = 128
     IN_CHANNELS = 3
     count = 0
     for i, dir in enumerate(dirs):
@@ -60,7 +65,7 @@ def main():
         test, batch_size=100, repeat=False, shuffle=False)
 
     updater = training.StandardUpdater(train_iter, optimizer, device=None)
-    trainer = training.Trainer(updater, (100, 'epoch'), out='result')
+    trainer = training.Trainer(updater, (60, 'epoch'), out='result')
     trainer.extend(extensions.Evaluator(test_iter, model, device=None))
     trainer.extend(extensions.LogReport())
     trainer.extend(extensions.PrintReport(

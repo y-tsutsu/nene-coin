@@ -4,7 +4,7 @@ import chainer.links as L
 
 
 class CNN(chainer.Chain):
-    CLASSES = 4
+    CLASSES = 12
 
     def __init__(self, train=True):
         super(CNN, self).__init__()
