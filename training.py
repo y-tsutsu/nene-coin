@@ -44,7 +44,7 @@ def load_data(dirname):
                 img = rescale(img, (IMAGE_SIZE / height,
                                     IMAGE_SIZE / width), mode='constant')
                 im = img.astype(np.float32).reshape(
-                    1, IMAGE_SIZE, IMAGE_SIZE, 3)
+                    1, IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS)
                 xs[idx, :, :, :] = im.transpose(0, 3, 1, 2)
                 ys[idx] = i
                 idx += 1

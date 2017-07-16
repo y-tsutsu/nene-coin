@@ -32,6 +32,9 @@ _ReSharper*/
 packages/
 env/
 image/
+image_next/
+sample/
+model/
 .vscode/
 __pycache__/
 result/
