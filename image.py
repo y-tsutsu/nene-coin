@@ -33,7 +33,7 @@ def clip_coin(filename):
 
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gaus_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
-    is_white_base = 128 < gray_img[10, 10]
+    is_white_base = 128 < gaus_img[10, 10]
     _, bin_img = cv2.threshold(
         gaus_img, 222 if is_white_base else 60, 255, cv2.THRESH_BINARY)
 
@@ -96,7 +96,7 @@ def rename(root):
 
 
 def create_sample_img():
-    root = './spam/'
+    root = './image_next/'
     for d in os.listdir(root):
         dirname = os.path.join(root, d)
         if os.path.isdir(dirname):
