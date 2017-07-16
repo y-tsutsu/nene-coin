@@ -6,9 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-MIN_SIZE = 64
-
-
 def show_bgrimg(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     plt.imshow(img)
@@ -23,7 +20,6 @@ def show_grayimg(img):
 
 def clip_coin(filename):
     '''
-    背景を黒にしてコイン部分を枠で囲う．
     バウンディングボックスを描画した画像と，その部分を切り取った画像リストをtupleで戻す．
     '''
 
@@ -35,7 +31,7 @@ def clip_coin(filename):
     gaus_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
     is_white_base = 128 < gaus_img[10, 10]
     _, bin_img = cv2.threshold(
-        gaus_img, 222 if is_white_base else 60, 255, cv2.THRESH_BINARY)
+        gaus_img, 192 if is_white_base else 60, 255, cv2.THRESH_BINARY)
 
     if is_white_base:
         bin_img = cv2.bitwise_not(bin_img)    # 背景が白の場合は必要
@@ -56,14 +52,11 @@ def clip_coin(filename):
         x, y, w, h = cv2.boundingRect(contour)
         n = min(w, h)
 
-        if n < MIN_SIZE:
-            continue
-
         clip_img = np.copy(masked_img[y:y + n, x:x + n])
         clip_imgs.append(clip_img)
-        cv2.rectangle(masked_img, (x, y), (x + n, y + n), (0, 255, 0), 2)
+        cv2.rectangle(img, (x, y), (x + n, y + n), (0, 255, 0), 2)
 
-    return masked_img, clip_imgs
+    return img, clip_imgs
 
 
 def clip_all(root):
