@@ -14,26 +14,26 @@ import seaborn
 import cv2
 
 
-IMAGE_SIZE = 128
-
-
 def inference(img):
+    IMAGE_SIZE = 128
+    IN_CHANNELS = 3
+
     model = L.Classifier(CNN())
     serializers.load_npz('./model/model.npz', model)
 
-    if img.shape[2] == 4:
+    if 2 < len(img.shape) and img.shape[2] == 4:
         img = skimage.color.rgba2rgb(img)
     height, width = img.shape[:2]
     img = rescale(img, (IMAGE_SIZE / height,
                         IMAGE_SIZE / width), mode='constant')
-    im = img.astype(np.float32).reshape(1, IMAGE_SIZE, IMAGE_SIZE, 3)
+    im = img.astype(np.float32).reshape(1, IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS)
     im = im.transpose(0, 3, 1, 2)
     x = Variable(im)
     y = model.predictor(x)
     [pred] = y.data
     print(pred)
     recog = np.argmax(pred)
-    return recog, im.reshape(3, IMAGE_SIZE, IMAGE_SIZE).transpose(1, 2, 0)
+    return recog, im.reshape(IN_CHANNELS, IMAGE_SIZE, IMAGE_SIZE).transpose(1, 2, 0)
 
 
 def main():
@@ -45,7 +45,7 @@ def main():
 
             count = 1
             for img in imgs:
-                plt.subplot(2, 3, count)
+                plt.subplot(3, 4, count)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 recog, img = inference(img)
                 plt.imshow(img)
