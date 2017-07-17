@@ -55,9 +55,15 @@ def load_data(dirname):
 
 def main():
     model = L.Classifier(Alex())
+    modelfile = './model/model.npz'
+    if os.path.isfile(modelfile):
+        serializers.load_npz(modelfile, model)
 
     optimizer = chainer.optimizers.Adam()
     optimizer.setup(model)
+    optfile = './model/optimizer.npz'
+    if os.path.isfile(optfile):
+        serializers.load_npz(optfile, optimizer)
 
     train = load_data('./image/train')
     test = load_data('./image/test')
