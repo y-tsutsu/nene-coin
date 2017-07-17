@@ -92,6 +92,8 @@ def clip_coin(filename):
 
 
 def clip_all(root):
+    IMAGE_SIZE = 128
+
     outdir = os.path.join(root, 'out')
     if os.path.isdir(outdir):
         shutil.rmtree(outdir)
@@ -101,11 +103,13 @@ def clip_all(root):
         if os.path.isfile(filename):
             _, imgs = clip_coin(filename)
             for img in imgs:
+                resize_img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
                 path, fname = os.path.split(filename)
                 body, exe = os.path.splitext(fname)
                 savename = os.path.join(
-                    outdir, '{}_{}{}'.format(body, id(img), '.png'))
-                cv2.imwrite(savename, img)
+                    outdir, '{}_{}{}'.format(body, id(resize_img), '.png'))
+
+                cv2.imwrite(savename, resize_img)
 
 
 def rename(root):
