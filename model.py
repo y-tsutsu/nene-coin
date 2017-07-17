@@ -3,11 +3,11 @@ import chainer.functions as F
 import chainer.links as L
 
 
-class CNN(chainer.Chain):
+class Alex(chainer.Chain):
     CLASSES = 12
 
     def __init__(self, train=True):
-        super(CNN, self).__init__()
+        super(Alex, self).__init__()
         with self.init_scope():
             self.conv1 = L.Convolution2D(None, 96, 11, stride=4)
             self.conv2 = L.Convolution2D(None, 256,  5, pad=2)
@@ -16,7 +16,7 @@ class CNN(chainer.Chain):
             self.conv5 = L.Convolution2D(None, 256,  3, pad=1)
             self.fc6 = L.Linear(None, 4096)
             self.fc7 = L.Linear(None, 4096)
-            self.fc8 = L.Linear(None, CNN.CLASSES)
+            self.fc8 = L.Linear(None, Alex.CLASSES)
 
     def __call__(self, x):
         h = F.max_pooling_2d(F.local_response_normalization(

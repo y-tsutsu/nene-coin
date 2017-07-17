@@ -3,7 +3,7 @@ import skimage.io
 import skimage.color
 from skimage.transform import rescale
 import os.path
-from model import CNN
+from model import Alex
 from image import clip_coin, show_bgrimg
 import chainer.links as L
 from chainer import serializers

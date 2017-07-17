@@ -1,4 +1,4 @@
-from model import CNN
+from model import Alex
 import chainer
 import chainer.function as F
 import chainer.links as L
@@ -54,7 +54,7 @@ def load_data(dirname):
 
 
 def main():
-    model = L.Classifier(CNN())
+    model = L.Classifier(Alex())
 
     optimizer = chainer.optimizers.Adam()
     optimizer.setup(model)
