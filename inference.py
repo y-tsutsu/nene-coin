@@ -14,12 +14,9 @@ import seaborn
 import cv2
 
 
-def inference(img):
+def inference(img, model):
     IMAGE_SIZE = 128
     IN_CHANNELS = 3
-
-    model = L.Classifier(CNN())
-    serializers.load_npz('./model/model.npz', model)
 
     if 2 < len(img.shape) and img.shape[2] == 4:
         img = skimage.color.rgba2rgb(img)
@@ -37,6 +34,9 @@ def inference(img):
 
 
 def main():
+    model = L.Classifier(Alex())
+    serializers.load_npz('./model/model.npz', model)
+
     for r, ds, fs in os.walk('./sample/00/'):
         for f in fs:
             filename = os.path.join(r, f)
@@ -47,7 +47,7 @@ def main():
             for img in imgs:
                 plt.subplot(3, 4, count)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                recog, img = inference(img)
+                recog, img = inference(img, model)
                 plt.imshow(img)
                 plt.title([
                     '  1_omote', '  1_ura',
