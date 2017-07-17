@@ -107,7 +107,7 @@ def clip_all(root):
                 path, fname = os.path.split(filename)
                 body, exe = os.path.splitext(fname)
                 savename = os.path.join(
-                    outdir, '{}_{}{}'.format(body, id(resize_img), '.png'))
+                    outdir, '{}_{}{}'.format(body, id(img), '.png'))
 
                 cv2.imwrite(savename, resize_img)
 
