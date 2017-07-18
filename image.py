@@ -79,6 +79,7 @@ def clip_coin(filename):
     masked_img = cv2.bitwise_and(img, mask_img)     # mask_imgの白部分のみimgを描画
 
     clip_imgs = []
+    boundingbox_img = np.copy(img)
     for contour in large_contours:
         x, y, w, h = cv2.boundingRect(contour)
         n = min(w, h)
@@ -86,9 +87,9 @@ def clip_coin(filename):
         clip_img = np.copy(masked_img[y:y + n, x:x + n])
         clip_img = draw_hole_black(clip_img)
         clip_imgs.append(clip_img)
-        cv2.rectangle(img, (x, y), (x + n, y + n), (0, 255, 0), 2)
+        cv2.rectangle(boundingbox_img, (x, y), (x + n, y + n), (0, 255, 0), 2)
 
-    return img, clip_imgs
+    return boundingbox_img, clip_imgs
 
 
 def clip_all(root):
