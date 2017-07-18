@@ -3,19 +3,9 @@ import shutil
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from image import show_bgrimg, show_grayimg
 
 path = './image/origin/100_01/'
-
-
-def rename():
-    count = 0
-    for r, ds, fs in os.walk(path):
-        for f in fs:
-            filename = os.path.join(r, f)
-            body, exe = os.path.splitext(f)
-            newname = os.path.join(r, '{0:04d}{1}'.format(count, exe))
-            os.rename(filename, newname)
-            count += 1
 
 
 def convert_png():
@@ -75,8 +65,8 @@ def rotate_img(dirname, is_test):
                 count += 1
                 angle = float(x * 10)
                 rotation_matrix = cv2.getRotationMatrix2D(center, angle, scale)
-                r_img = cv2.warpAffine(
-                    img, rotation_matrix, size, flags=cv2.INTER_CUBIC)
+                r_img = cv2.warpAffine(img, rotation_matrix, size, dst=img,
+                                       flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_TRANSPARENT)
                 f1, f2 = os.path.splitext(filename)
                 savename = '{0}/{1}_{2:03d}{3}'.format(
                     r, os.path.split(f1)[1], int(angle), f2)
@@ -85,8 +75,8 @@ def rotate_img(dirname, is_test):
 
 
 def main():
-    rotate_img('./image/origin/train/', False)
-    rotate_img('./image/origin/test/', True)
+    rotate_img('./image/train/', False)
+    rotate_img('./image/test/', True)
 
 
 if __name__ == '__main__':
