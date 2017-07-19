@@ -9,14 +9,12 @@ from chainer.training import extensions
 import os
 import os.path
 import numpy as np
-import skimage.io
-import skimage.color
-from skimage.transform import rescale
+import cv2
 
 
 def load_data(dirname):
     IMAGE_SIZE = 128
-    IN_CHANNELS = 3
+    IN_CHANNELS = 1
 
     dirs = ['001_00', '001_01',
             '005_00', '005_01',
@@ -38,15 +36,13 @@ def load_data(dirname):
         for r, ds, fs in os.walk(os.path.join(dirname, dir)):
             for f in fs:
                 filename = os.path.join(r, f)
-                img = skimage.io.imread(filename)
-                if img.shape[2] == 4:
-                    img = skimage.color.rgba2rgb(img)
-                height, width = img.shape[:2]
-                img = rescale(img, (IMAGE_SIZE / height,
-                                    IMAGE_SIZE / width), mode='constant')
+                img = cv2.imread(filename)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
+                img = img / 255
                 im = img.astype(np.float32).reshape(
-                    1, IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS)
-                xs[idx, :, :, :] = im.transpose(0, 3, 1, 2)
+                    IN_CHANNELS, IMAGE_SIZE, IMAGE_SIZE)
+                xs[idx] = im
                 ys[idx] = i
                 idx += 1
 
