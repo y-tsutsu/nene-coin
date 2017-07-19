@@ -14,7 +14,7 @@ import cv2
 
 def load_data(dirname):
     IMAGE_SIZE = 128
-    IN_CHANNELS = 1
+    IN_CHANNELS = 3
 
     dirs = ['001_00', '001_01',
             '005_00', '005_01',
@@ -37,11 +37,10 @@ def load_data(dirname):
             for f in fs:
                 filename = os.path.join(r, f)
                 img = cv2.imread(filename)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
                 img = img / 255
                 im = img.astype(np.float32).reshape(
-                    IN_CHANNELS, IMAGE_SIZE, IMAGE_SIZE)
+                    IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS).transpose(2, 0, 1)
                 xs[idx] = im
                 ys[idx] = i
                 idx += 1
