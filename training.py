@@ -37,6 +37,7 @@ def load_data(dirname):
             for f in fs:
                 filename = os.path.join(r, f)
                 img = cv2.imread(filename)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
                 img = img / 255
                 im = img.astype(np.float32).reshape(

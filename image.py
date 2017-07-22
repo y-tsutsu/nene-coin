@@ -27,8 +27,6 @@ def clip_coin(filename):
     ret, bin_img = cv2.threshold(
         gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-    a = bin_img.mean()
-
     if 255 / 2 < bin_img.mean():
         bin_img = cv2.bitwise_not(bin_img)
 

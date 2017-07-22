@@ -44,7 +44,7 @@ def resize_img():
             cv2.imwrite(filename, img)
 
 
-def rotate_img(dirname, is_test):
+def rotate_img(dirname):
     for r, ds, fs in os.walk(dirname):
         for f in fs:
             filename = os.path.join(r, f)
@@ -52,17 +52,7 @@ def rotate_img(dirname, is_test):
             size = tuple([img.shape[1], img.shape[0]])
             center = tuple([int(size[0] / 2), int(size[1] / 2)])
             scale = 1.0
-            count = 0
             for x in range(0, 36):
-                if is_test:
-                    if count % 6 != 1:
-                        count += 1
-                        continue
-                else:
-                    if count % 6 == 1:
-                        count += 1
-                        continue
-                count += 1
                 angle = float(x * 10)
                 rotation_matrix = cv2.getRotationMatrix2D(center, angle, scale)
                 r_img = cv2.warpAffine(img, rotation_matrix, size, dst=img,
@@ -75,8 +65,8 @@ def rotate_img(dirname, is_test):
 
 
 def main():
-    rotate_img('./image/train/', False)
-    rotate_img('./image/test/', True)
+    rotate_img('./image/train/')
+    rotate_img('./image/test/')
 
 
 if __name__ == '__main__':
