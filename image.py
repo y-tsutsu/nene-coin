@@ -24,17 +24,20 @@ def show_grayimg(img):
 
 
 def normalize_image(img):
-    img = np.copy(img)
-    r = img[:, :, 0]
-    g = img[:, :, 1]
-    b = img[:, :, 2]
-    r = (r - np.mean(r)) / np.std(r) * 64 + 128
-    g = (g - np.mean(g)) / np.std(g) * 64 + 128
-    b = (b - np.mean(b)) / np.std(b) * 64 + 128
-    img[:, :, 0] = r
-    img[:, :, 1] = g
-    img[:, :, 2] = b
-    return img
+    if len(img.shape) == 3:
+        img = np.copy(img)
+        r = img[:, :, 0]
+        g = img[:, :, 1]
+        b = img[:, :, 2]
+        r = (r - np.mean(r)) / np.std(r) * 64 + 128
+        g = (g - np.mean(g)) / np.std(g) * 64 + 128
+        b = (b - np.mean(b)) / np.std(b) * 64 + 128
+        img[:, :, 0] = r
+        img[:, :, 1] = g
+        img[:, :, 2] = b
+    else:
+        img = (img - np.mean(img)) / np.std(img) * 64 + 128
+    return img.astype(np.uint8)
 
 
 def adjust_gamma(img):
@@ -50,7 +53,7 @@ def adjust_gamma(img):
         lookUpTable[i][0] = 255 * pow(float(i) / 255, 1.0 / gamma)
 
     img = cv2.LUT(img, lookUpTable)
-    # img = normalize_image(img)
+    img = normalize_image(img)
     return img
 
 

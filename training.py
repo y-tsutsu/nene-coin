@@ -15,7 +15,7 @@ import cv2
 
 def load_data(dirname):
     IMAGE_SIZE = 128
-    IN_CHANNELS = 3
+    IN_CHANNELS = 1
 
     dirs = ['001_00', '001_01',
             '005_00', '005_01',
@@ -38,7 +38,8 @@ def load_data(dirname):
             for f in fs:
                 filename = os.path.join(r, f)
                 img = cv2.imread(filename)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                img = cv2.cvtColor(
+                    img, cv2.COLOR_BGR2RGB if IN_CHANNELS == 3 else cv2.COLOR_BGR2GRAY)
                 img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
                 img = adjust_gamma(img)
                 img = img / 255
