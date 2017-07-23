@@ -23,6 +23,20 @@ def show_grayimg(img):
     plt.show()
 
 
+def normalize_image(img):
+    img = np.copy(img)
+    r = img[:, :, 0]
+    g = img[:, :, 1]
+    b = img[:, :, 2]
+    r = (r - np.mean(r)) / np.std(r) * 64 + 128
+    g = (g - np.mean(g)) / np.std(g) * 64 + 128
+    b = (b - np.mean(b)) / np.std(b) * 64 + 128
+    img[:, :, 0] = r
+    img[:, :, 1] = g
+    img[:, :, 2] = b
+    return img
+
+
 def adjust_gamma(img):
     ave = img.mean()
     base = 3
@@ -31,13 +45,13 @@ def adjust_gamma(img):
     else:
         gamma = (1 / base - 1) / 128 * ave + (base - 1 - 1 / base)
 
-    print(ave, gamma)
-
     lookUpTable = np.zeros((256, 1), dtype='uint8')
     for i in range(256):
         lookUpTable[i][0] = 255 * pow(float(i) / 255, 1.0 / gamma)
 
-    return cv2.LUT(img, lookUpTable)
+    img = cv2.LUT(img, lookUpTable)
+    # img = normalize_image(img)
+    return img
 
 
 def clip_coin(filename):
@@ -109,7 +123,7 @@ def rename(root):
 
 
 def create_sample_img():
-    root = './image_next/'
+    root = './sample/'
     for d in os.listdir(root):
         dirname = os.path.join(root, d)
         if os.path.isdir(dirname):
