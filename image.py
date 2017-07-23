@@ -6,6 +6,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def show_rgbimg(img):
+    plt.imshow(img)
+    plt.show()
+
+
 def show_bgrimg(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     plt.imshow(img)
@@ -16,6 +21,23 @@ def show_grayimg(img):
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     plt.imshow(img)
     plt.show()
+
+
+def adjust_gamma(img):
+    ave = img.mean()
+    base = 3
+    if ave < 128:
+        gamma = -(base - 1) / 128 * ave + base
+    else:
+        gamma = (1 / base - 1) / 128 * ave + (base - 1 - 1 / base)
+
+    print(ave, gamma)
+
+    lookUpTable = np.zeros((256, 1), dtype='uint8')
+    for i in range(256):
+        lookUpTable[i][0] = 255 * pow(float(i) / 255, 1.0 / gamma)
+
+    return cv2.LUT(img, lookUpTable)
 
 
 def clip_coin(filename):

@@ -1,7 +1,6 @@
-import string
 import os.path
 from model import Alex
-from image import clip_coin, show_bgrimg
+from image import clip_coin, adjust_gamma, show_bgrimg
 import chainer.links as L
 from chainer import serializers
 from chainer import Variable
@@ -15,7 +14,9 @@ def inference(img, model):
     IMAGE_SIZE = 128
     IN_CHANNELS = 3
 
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
+    img = adjust_gamma(img)
     img = img / 255
     im = img.astype(np.float32).reshape(
         1, IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS).transpose(0, 3, 1, 2)
@@ -40,7 +41,6 @@ def main():
             count = 1
             for img in imgs:
                 plt.subplot(3, 4, count)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 recog, img = inference(img, model)
                 plt.imshow(img)
                 plt.title([

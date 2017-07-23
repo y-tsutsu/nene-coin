@@ -1,4 +1,5 @@
 from model import Alex
+from image import adjust_gamma
 import chainer
 import chainer.function as F
 import chainer.links as L
@@ -39,6 +40,7 @@ def load_data(dirname):
                 img = cv2.imread(filename)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
+                img = adjust_gamma(img)
                 img = img / 255
                 im = img.astype(np.float32).reshape(
                     IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS).transpose(2, 0, 1)
