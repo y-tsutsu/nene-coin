@@ -12,12 +12,12 @@ import cv2
 
 def inference(img, model):
     IMAGE_SIZE = 128
-    IN_CHANNELS = 1
+    IN_CHANNELS = 3
 
     img = cv2.cvtColor(img,
                        cv2.COLOR_BGR2RGB if IN_CHANNELS == 3 else cv2.COLOR_BGR2GRAY)
-    img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
     img = adjust_gamma(img)
+    img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
     img = img / 255
     im = img.astype(np.float32).reshape(
         1, IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS).transpose(0, 3, 1, 2)

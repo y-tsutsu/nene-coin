@@ -36,24 +36,32 @@ def normalize_image(img):
         img[:, :, 1] = g
         img[:, :, 2] = b
     else:
+        img = np.copy(img)
         img = (img - np.mean(img)) / np.std(img) * 64 + 128
     return img.astype(np.uint8)
 
 
 def adjust_gamma(img):
     ave = img.mean()
-    base = 3
+    base = 5
     if ave < 128:
         gamma = -(base - 1) / 128 * ave + base
     else:
-        gamma = (1 / base - 1) / 128 * ave + (base - 1 - 1 / base)
+        gamma = (1 / base - 1) / 128 * ave + (2 - 1 / base)
 
     lookUpTable = np.zeros((256, 1), dtype='uint8')
     for i in range(256):
         lookUpTable[i][0] = 255 * pow(float(i) / 255, 1.0 / gamma)
 
     img = cv2.LUT(img, lookUpTable)
-    img = normalize_image(img)
+    return img
+
+
+def update_image(img):
+    if len(img.shape) == 3:
+        img = adjust_gamma(img)
+    else:
+        img = normalize_image(img)
     return img
 
 
