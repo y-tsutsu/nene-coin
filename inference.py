@@ -50,6 +50,7 @@ def main():
                     ' 50_omote', ' 50_ura',
                     '100_omote', '100_ura',
                     '500_omote', '500_ura'][recog])
+                plt.axis('off')
                 count += 1
             plt.show()
 
