@@ -54,33 +54,73 @@ def adjust_gamma(img):
     return img
 
 
+def square_check(contour):
+    ''' 正方形っぽいときにTrueを戻す． '''
+    x, y, w, h = cv2.boundingRect(contour)
+    return w * 0.8 < h and h < w * 1.2
+
+
+def remove_near_point(contours, img):
+    ''' 座標が同じバウンディングボックスを省く '''
+    height = img.shape[0]
+    width = img.shape[1]
+    result = []
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        for r in result:
+            rx, ry, rw, rh = cv2.boundingRect(r)
+            if ((x - rx) ** 2 < (width * 0.05) ** 2) and ((y - ry) ** 2 < (height * 0.05) ** 2):
+                break
+        else:
+            result.append(contour)
+    return result
+
+
+def remove_inner_box(contours):
+    ''' 他のバウンディングボックスの内部に含まれるものを省く '''
+    result = []
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        for other in contours:
+            ox, oy, ow, oh = cv2.boundingRect(other)
+            if ox < x and x < ox + ow and oy < y and y < oy + oh:
+                break
+        else:
+            result.append(contour)
+    return result
+
+
 def clip_coin(filename):
     '''
     バウンディングボックスを描画した画像と，その部分を切り取った画像リストをtupleで戻す．
     '''
     img = cv2.imread(filename)
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ret, bin_img = cv2.threshold(
-        gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    one_chan_imgs = [cv2.cvtColor(
+        img, cv2.COLOR_BGR2GRAY), img[:, :, 0], img[:, :, 1], img[:, :, 2]]
 
-    if 255 / 2 < bin_img.mean():
-        bin_img = cv2.bitwise_not(bin_img)
+    contours = []
+    for one_img in one_chan_imgs:
+        ret, bin_img = cv2.threshold(
+            one_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-    _, coins_contours, __ = cv2.findContours(
-        bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    min_coin_area = 10000
-    large_contours = [
-        x for x in coins_contours if min_coin_area < cv2.contourArea(x)]
+        if 255 / 2 < bin_img.mean():
+            bin_img = cv2.bitwise_not(bin_img)
 
-    def inner_check(a, b):
-        return a * 0.8 < b and b < a * 1.2
+        _, x, __ = cv2.findContours(
+            bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        contours += x
+
+    min_coin_area = img.shape[0] * img.shape[1] // 1000
+    contours = [x for x in contours if min_coin_area <
+                cv2.contourArea(x) and square_check(x)]
+    contours = remove_near_point(contours, img)
+    contours = remove_inner_box(contours)
 
     clip_imgs = []
     boundingbox_img = np.copy(img)
-    for contour in large_contours:
+    for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
-        if not inner_check(w, h):
-            continue
         n = min(w, h)
         clip_imgs.append(img[y:y + n, x:x + n])
         cv2.rectangle(boundingbox_img, (x, y), (x + n, y + n), (0, 255, 0), 10)
