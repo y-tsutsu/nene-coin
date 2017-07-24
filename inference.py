@@ -1,6 +1,6 @@
 import os.path
 from model import Alex
-from image import clip_coin, update_image, show_bgrimg
+from image import clip_coin, correct_image, show_bgrimg
 import chainer.links as L
 from chainer import serializers
 from chainer import Variable
@@ -16,7 +16,7 @@ def inference(img, model):
 
     img = cv2.cvtColor(img,
                        cv2.COLOR_BGR2RGB if IN_CHANNELS == 3 else cv2.COLOR_BGR2GRAY)
-    img = update_image(img)
+    img = correct_image(img)
     img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
     img = img / 255
     im = img.astype(np.float32).reshape(

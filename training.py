@@ -1,5 +1,5 @@
 from model import Alex
-from image import update_image
+from image import correct_image
 import chainer
 import chainer.function as F
 import chainer.links as L
@@ -40,7 +40,7 @@ def load_data(dirname):
                 img = cv2.imread(filename)
                 img = cv2.cvtColor(
                     img, cv2.COLOR_BGR2RGB if IN_CHANNELS == 3 else cv2.COLOR_BGR2GRAY)
-                img = update_image(img)
+                img = correct_image(img)
                 img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
                 img = img / 255
                 im = img.astype(np.float32).reshape(

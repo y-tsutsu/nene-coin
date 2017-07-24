@@ -42,7 +42,8 @@ def normalize_image(img):
 
 
 def adjust_gamma(img):
-    ave = img.mean()
+    h, w, d = img.shape
+    ave = img[int(0.2 * h):int(0.8 * h), int(0.2 * h):int(0.8 * h), :].mean()
     base = 5
     if ave < 128:
         gamma = -(base - 1) / 128 * ave + base
@@ -57,7 +58,7 @@ def adjust_gamma(img):
     return img
 
 
-def update_image(img):
+def correct_image(img):
     if len(img.shape) == 3:
         img = adjust_gamma(img)
     else:
