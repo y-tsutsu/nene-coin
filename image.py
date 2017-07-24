@@ -58,14 +58,6 @@ def adjust_gamma(img):
     return img
 
 
-def correct_image(img):
-    if len(img.shape) == 3:
-        img = adjust_gamma(img)
-    else:
-        img = normalize_image(img)
-    return img
-
-
 def square_check(contour):
     ''' 正方形っぽいときにTrueを戻す． '''
     x, y, w, h = cv2.boundingRect(contour)

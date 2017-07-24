@@ -1,5 +1,5 @@
 from model import Alex
-from image import correct_image
+from image import adjust_gamma, normalize_image
 import chainer
 import chainer.function as F
 import chainer.links as L
@@ -15,7 +15,7 @@ import cv2
 
 def load_data(dirname):
     IMAGE_SIZE = 160
-    IN_CHANNELS = 3
+    IN_CHANNELS = 1
 
     dirs = ['001_00', '001_01',
             '005_00', '005_01',
@@ -38,9 +38,12 @@ def load_data(dirname):
             for f in fs:
                 filename = os.path.join(r, f)
                 img = cv2.imread(filename)
-                img = cv2.cvtColor(
-                    img, cv2.COLOR_BGR2RGB if IN_CHANNELS == 3 else cv2.COLOR_BGR2GRAY)
-                img = correct_image(img)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                if IN_CHANNELS == 1:
+                    img = normalize_image(img)
+                    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+                else:
+                    img = adjust_gamma(img)
                 img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
                 img = img / 255
                 im = img.astype(np.float32).reshape(
