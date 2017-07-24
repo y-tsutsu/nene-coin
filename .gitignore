@@ -32,7 +32,7 @@ _ReSharper*/
 packages/
 env/
 image/
-image_next/
+image_*/
 sample/
 model/
 .vscode/

@@ -52,10 +52,10 @@ def rotate_img(dirname):
             size = tuple([img.shape[1], img.shape[0]])
             center = tuple([int(size[0] / 2), int(size[1] / 2)])
             scale = 1.0
-            for x in range(0, 36):
-                angle = float(x * 10)
+            for x in range(0, 8):
+                angle = float(x * 45)
                 rotation_matrix = cv2.getRotationMatrix2D(center, angle, scale)
-                r_img = cv2.warpAffine(img, rotation_matrix, size, dst=img,
+                r_img = cv2.warpAffine(img, rotation_matrix, size, dst=np.copy(img),
                                        flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_TRANSPARENT)
                 f1, f2 = os.path.splitext(filename)
                 savename = '{0}/{1}_{2:03d}{3}'.format(

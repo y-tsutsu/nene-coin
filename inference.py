@@ -1,6 +1,6 @@
 import os.path
 from model import Alex
-from image import clip_coin, adjust_gamma, show_bgrimg
+from image import clip_coin, update_image, show_bgrimg
 import chainer.links as L
 from chainer import serializers
 from chainer import Variable
@@ -11,12 +11,12 @@ import cv2
 
 
 def inference(img, model):
-    IMAGE_SIZE = 128
+    IMAGE_SIZE = 160
     IN_CHANNELS = 3
 
     img = cv2.cvtColor(img,
                        cv2.COLOR_BGR2RGB if IN_CHANNELS == 3 else cv2.COLOR_BGR2GRAY)
-    img = adjust_gamma(img)
+    img = update_image(img)
     img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
     img = img / 255
     im = img.astype(np.float32).reshape(
@@ -41,6 +41,8 @@ def main():
 
             count = 1
             for img in imgs:
+                if 12 < count:
+                    break
                 plt.subplot(3, 4, count)
                 recog, img = inference(img, model)
                 plt.imshow(img)
