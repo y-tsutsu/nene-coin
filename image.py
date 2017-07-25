@@ -6,6 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+IMAGE_SIZE = (64, 64)
+
+
 def show_rgbimg(img):
     plt.imshow(img)
     plt.show()
@@ -133,8 +136,6 @@ def clip_coin(filename):
 
 
 def clip_all(root):
-    IMAGE_SIZE = 128
-
     outdir = os.path.join(root, 'out')
     if os.path.isdir(outdir):
         shutil.rmtree(outdir)
@@ -145,7 +146,7 @@ def clip_all(root):
         if os.path.isfile(filename):
             _, imgs = clip_coin(filename)
             for img in imgs:
-                resize_img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
+                resize_img = cv2.resize(img, IMAGE_SIZE)
                 path, fname = os.path.split(filename)
                 body, exe = os.path.splitext(fname)
                 savename = os.path.join(

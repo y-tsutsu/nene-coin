@@ -1,5 +1,5 @@
 from model import Alex
-from image import adjust_gamma, normalize_image
+from image import adjust_gamma, normalize_image, IMAGE_SIZE
 import chainer
 import chainer.function as F
 import chainer.links as L
@@ -14,7 +14,6 @@ import cv2
 
 
 def load_data(dirname):
-    IMAGE_SIZE = 160
     IN_CHANNELS = 1
 
     dirs = ['001_00', '001_01',
@@ -28,8 +27,8 @@ def load_data(dirname):
     for i, dir in enumerate(dirs):
         for r, ds, fs in os.walk(os.path.join(dirname, dir)):
             count += len(fs)
-    xs = np.zeros((count, IN_CHANNELS, IMAGE_SIZE,
-                   IMAGE_SIZE)).astype(np.float32)
+    xs = np.zeros((count, IN_CHANNELS, IMAGE_SIZE[0], IMAGE_SIZE[1])).astype(
+        np.float32)
     ys = np.zeros(count).astype(np.int32)
 
     idx = 0
@@ -43,11 +42,11 @@ def load_data(dirname):
                     img = normalize_image(img)
                     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
                 else:
-                    img = adjust_gamma(img)
-                img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
+                    img = normalize_image(img)
+                img = cv2.resize(img, IMAGE_SIZE)
                 img = img / 255
                 im = img.astype(np.float32).reshape(
-                    IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS).transpose(2, 0, 1)
+                    IMAGE_SIZE[0], IMAGE_SIZE[1], IN_CHANNELS).transpose(2, 0, 1)
                 xs[idx] = im
                 ys[idx] = i
                 idx += 1
@@ -74,7 +73,7 @@ def main():
         test, batch_size=100, repeat=False, shuffle=False)
 
     updater = training.StandardUpdater(train_iter, optimizer, device=None)
-    trainer = training.Trainer(updater, (60, 'epoch'), out='result')
+    trainer = training.Trainer(updater, (30, 'epoch'), out='result')
     trainer.extend(extensions.Evaluator(test_iter, model, device=None))
     trainer.extend(extensions.LogReport())
     trainer.extend(extensions.PrintReport(
