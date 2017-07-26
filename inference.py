@@ -22,7 +22,7 @@ def inference(img, model):
     img = cv2.resize(img, IMAGE_SIZE)
     img = img / 255
     im = img.astype(np.float32).reshape(
-        1, IMAGE_SIZE, IMAGE_SIZE, IN_CHANNELS).transpose(0, 3, 1, 2)
+        1, IMAGE_SIZE[0], IMAGE_SIZE[1], IN_CHANNELS).transpose(0, 3, 1, 2)
     x = Variable(im)
     y = model.predictor(x)
     [pred] = y.data

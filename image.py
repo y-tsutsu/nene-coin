@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-IMAGE_SIZE = (64, 64)
+IMAGE_SIZE = (160, 160)
 
 
 def show_rgbimg(img):
@@ -150,7 +150,7 @@ def clip_all(root):
                 path, fname = os.path.split(filename)
                 body, exe = os.path.splitext(fname)
                 savename = os.path.join(
-                    outdir, '{}_{}{}'.format(body, count, '.png'))
+                    outdir, '{}_{:04d}{}'.format(body, count, '.png'))
                 count += 1
                 cv2.imwrite(savename, resize_img)
 
@@ -168,7 +168,7 @@ def rename(root):
 
 
 def create_sample_img():
-    root = './sample/'
+    root = './image/org/'
     for d in os.listdir(root):
         dirname = os.path.join(root, d)
         if os.path.isdir(dirname):

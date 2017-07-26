@@ -80,10 +80,6 @@ def increase_img(dirname):
 
 
 def main():
-    resize_img('./image/train/')
-    resize_img('./image/test/')
-    increase_img('./image/train/')
-    increase_img('./image/test/')
     rotate_img('./image/train/')
     rotate_img('./image/test/')
 
