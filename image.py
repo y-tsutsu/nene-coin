@@ -63,8 +63,26 @@ def adjust_gamma(img):
 
 def square_check(contour):
     ''' 正方形っぽいときにTrueを戻す． '''
-    x, y, w, h = cv2.boundingRect(contour)
-    return w * 0.8 < h and h < w * 1.2
+    x, y, w, h = contour
+    return w * 0.9 < h and h < w * 1.1
+
+
+def remove_illegal_coin(contours):
+    ''' 面積が大きく他とはずれているものを省く '''
+    if len(contours) < 3:
+        return contours
+    result = contours[:]
+    areas = [w * h for x, y, w, h in contours]
+    ave = np.array(areas).mean()
+    remove_idxs = []
+    for idx, area in enumerate(areas):
+        a = np.array([x for x in areas if x != area]).mean()
+        if a < ave * 0.95 or ave * 1.05 < a:
+            remove_idxs.append(idx)
+    remove_idxs = remove_idxs[::-1]
+    for i in remove_idxs:
+        result.pop(i)
+    return result
 
 
 def remove_near_point(contours, img):
@@ -73,9 +91,9 @@ def remove_near_point(contours, img):
     width = img.shape[1]
     result = []
     for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
+        x, y, w, h = contour
         for r in result:
-            rx, ry, rw, rh = cv2.boundingRect(r)
+            rx, ry, rw, rh = r
             if ((x - rx) ** 2 < (width * 0.05) ** 2) and ((y - ry) ** 2 < (height * 0.05) ** 2):
                 break
         else:
@@ -87,14 +105,54 @@ def remove_inner_box(contours):
     ''' 他のバウンディングボックスの内部に含まれるものを省く '''
     result = []
     for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
+        x, y, w, h = contour
         for other in contours:
-            ox, oy, ow, oh = cv2.boundingRect(other)
-            if ox < x and x < ox + ow and oy < y and y < oy + oh:
+            ox, oy, ow, oh = other
+            if ox < x and x + w < ox + ow and oy < y and y + h < oy + oh:
                 break
         else:
             result.append(contour)
     return result
+
+
+def edge_image(img):
+    ''' エッジ検出 '''
+    img_sobelx = cv2.Sobel(img, cv2.CV_32F, 1, 0)
+    img_sobely = cv2.Sobel(img, cv2.CV_32F, 0, 1)
+    img_abs_sobelx = cv2.convertScaleAbs(img_sobelx)
+    img_abs_sobely = cv2.convertScaleAbs(img_sobely)
+    img_sobel_edge = cv2.addWeighted(
+        img_abs_sobelx, 0.5, img_abs_sobely, 0.5, 0)
+    return img_sobel_edge
+
+
+def clip_coin_partial(img, offset):
+    '''
+    渡された画像を切り取る．x，y座標は渡されたoffsetで補正する．
+    '''
+    one_chan_imgs = [cv2.cvtColor(
+        img, cv2.COLOR_BGR2GRAY), img[:, :, 0], img[:, :, 1], img[:, :, 2]]
+
+    contours = []   # (x, y, w, h)のリスト
+    for one_img in one_chan_imgs:
+        ret, bin_img = cv2.threshold(
+            one_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        _, contour, __ = cv2.findContours(
+            bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours += [cv2.boundingRect(x) for x in contour]
+
+        bin_img = cv2.bitwise_not(bin_img)
+
+        _, contour, __ = cv2.findContours(
+            bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours += [cv2.boundingRect(x) for x in contour]
+
+    min_coin_area = img.shape[0] * img.shape[1] // 50
+    contours = [x for x in contours if min_coin_area <
+                x[2] * x[3] and square_check(x)]
+    contours = remove_illegal_coin(contours)
+    return [(x + offset[0], y + offset[1], w, h) for x, y, w, h in contours]
 
 
 def clip_coin(filename):
@@ -102,32 +160,35 @@ def clip_coin(filename):
     バウンディングボックスを描画した画像と，その部分を切り取った画像リストをtupleで戻す．
     '''
     img = cv2.imread(filename)
-    one_chan_imgs = [cv2.cvtColor(
-        img, cv2.COLOR_BGR2GRAY), img[:, :, 0], img[:, :, 1], img[:, :, 2]]
 
-    contours = []
-    for one_img in one_chan_imgs:
-        ret, bin_img = cv2.threshold(
-            one_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    contours = []   # (x, y, w, h)のリスト
+    contours += clip_coin_partial(img, (0, 0))
+    height, width, _ = img.shape
+    contours += clip_coin_partial(img[:height // 2, :, :], (0, 0))
+    contours += clip_coin_partial(img[height // 2:, :, :], (0, height // 2))
+    contours += clip_coin_partial(img[:, :width // 2, :], (0, 0))
+    contours += clip_coin_partial(img[:, width // 2:, :], (width // 2, 0))
 
-        if 255 / 2 < bin_img.mean():
-            bin_img = cv2.bitwise_not(bin_img)
+    contours += clip_coin_partial(img[height // 4:height // 4 * 3, :, :], (0, height // 4))
+    contours += clip_coin_partial(img[:, width // 4:width // 4 * 3, :], (width // 4, 0))
 
-        _, x, __ = cv2.findContours(
-            bin_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours += clip_coin_partial(img[:height // 2, :width // 2, :], (0, 0))
+    contours += clip_coin_partial(img[:height // 2, width // 2:, :], (width // 2, 0))
+    contours += clip_coin_partial(img[height // 2:, :width // 2, :], (0, height // 2))
+    contours += clip_coin_partial(img[height // 2:, width // 2:, :], (width // 2, height // 2))
 
-        contours += x
+    contours += clip_coin_partial(img[height // 4:height // 4 * 3, :width // 2, :], (0, height // 4))
+    contours += clip_coin_partial(img[height // 4:height // 4 * 3, width // 2:, :], (width // 2, height // 4))
+    contours += clip_coin_partial(img[:height // 2, width // 4:width // 4 * 3, :], (width // 4, 0))
+    contours += clip_coin_partial(img[height // 2:, width // 4:width // 4 * 3, :], (width // 4, height // 2))
 
-    min_coin_area = img.shape[0] * img.shape[1] // 1000
-    contours = [x for x in contours if min_coin_area <
-                cv2.contourArea(x) and square_check(x)]
+    contours = remove_illegal_coin(contours)
     contours = remove_near_point(contours, img)
-    contours = remove_inner_box(contours)
 
     clip_imgs = []
     boundingbox_img = np.copy(img)
     for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
+        x, y, w, h = contour
         n = min(w, h)
         clip_imgs.append(img[y:y + n, x:x + n])
         cv2.rectangle(boundingbox_img, (x, y), (x + n, y + n), (0, 255, 0), 10)
