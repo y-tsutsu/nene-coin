@@ -35,7 +35,7 @@ def main():
     model = L.Classifier(Alex())
     serializers.load_npz('./model/model.npz', model)
 
-    for r, ds, fs in os.walk('./sample/00/'):
+    for r, ds, fs in os.walk('./sample/0001/'):
         for f in fs:
             filename = os.path.join(r, f)
             image, imgs = clip_coin(filename)
@@ -46,8 +46,8 @@ def main():
                 if 12 < count:
                     break
                 plt.subplot(3, 4, count)
-                recog, img = inference(img, model)
-                plt.imshow(img)
+                recog, img_ = inference(img, model)
+                plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 plt.title([
                     '  1_omote', '  1_ura',
                     '  5_omote', '  5_ura',

@@ -18,7 +18,7 @@ def load_model():
 
 
 def demo(model, dirname):
-    root = os.path.join(r'C:\deep-learning\nene-coin', dirname)
+    root = os.path.join('./sample/', dirname)
     for f in os.listdir(root):
         filename = os.path.join(root, f)
         if not os.path.isfile:
@@ -42,7 +42,7 @@ def demo(model, dirname):
 
 def main():
     model = load_model()
-    demo(model, 'sample')
+    demo(model, '0001')
 
 
 if __name__ == '__main__':

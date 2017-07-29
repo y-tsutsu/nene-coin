@@ -76,7 +76,10 @@ def remove_illegal_coin(contours):
     ave = np.array(areas).mean()
     remove_idxs = []
     for idx, area in enumerate(areas):
-        a = np.array([x for x in areas if x != area]).mean()
+        others = [x for x in areas if x != area]
+        if len(others) < 2:
+            continue
+        a = np.array(others).mean()
         if a < ave * 0.95 or ave * 1.05 < a:
             remove_idxs.append(idx)
     remove_idxs = remove_idxs[::-1]
