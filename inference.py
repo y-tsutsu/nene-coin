@@ -33,7 +33,7 @@ def inference(img, model, in_channels):
     y = model.predictor(x)
     [pred] = y.data
     pred = softmax(pred)
-    print(pred)
+    print(('[{:.5f} {:.5f}]  ' * (len(pred) // 2)).format(*pred))
     return pred, img
 
 
