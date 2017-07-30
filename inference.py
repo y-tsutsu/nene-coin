@@ -10,11 +10,17 @@ import seaborn
 import cv2
 
 
-def inference(img, model):
-    IN_CHANNELS = 1
+def softmax(a):
+    c = np.max(a)
+    exp_a = np.exp(a - c)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+    return y
 
+
+def inference(img, model, in_channels):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    if IN_CHANNELS == 1:
+    if in_channels == 1:
         img = normalize_image(img)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     else:
@@ -22,18 +28,19 @@ def inference(img, model):
     img = cv2.resize(img, IMAGE_SIZE)
     img = img / 255
     im = img.astype(np.float32).reshape(
-        1, IMAGE_SIZE[0], IMAGE_SIZE[1], IN_CHANNELS).transpose(0, 3, 1, 2)
+        1, IMAGE_SIZE[0], IMAGE_SIZE[1], in_channels).transpose(0, 3, 1, 2)
     x = Variable(im)
     y = model.predictor(x)
     [pred] = y.data
+    pred = softmax(pred)
     print(pred)
-    recog = np.argmax(pred)
-    return recog, img
+    return pred, img
 
 
 def main():
     model = L.Classifier(Alex())
     serializers.load_npz('./model/model.npz', model)
+    IN_CHANNELS = 3
 
     for r, ds, fs in os.walk('./sample/0001/'):
         for f in fs:
@@ -46,7 +53,8 @@ def main():
                 if 12 < count:
                     break
                 plt.subplot(3, 4, count)
-                recog, img_ = inference(img, model)
+                pred, img_ = inference(img, model, IN_CHANNELS)
+                recog = np.argmax(pred)
                 plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 plt.title([
                     '  1_omote', '  1_ura',

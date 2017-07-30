@@ -11,13 +11,15 @@ from image import clip_coin, show_bgrimg
 
 
 def load_model():
-    model = L.Classifier(Alex())
-    serializers.load_npz('./model/model.npz', model)
-    print('complete load model.')
-    return model
+    model_gray = L.Classifier(Alex())
+    serializers.load_npz('./model/model_gray.npz', model_gray)
+    model_color = L.Classifier(Alex())
+    serializers.load_npz('./model/model_color.npz', model_color)
+    print('Load completed!!')
+    return model_gray, model_color
 
 
-def demo(model, dirname):
+def demo(models, dirname):
     root = os.path.join('./sample/', dirname)
     for f in os.listdir(root):
         filename = os.path.join(root, f)
@@ -30,7 +32,10 @@ def demo(model, dirname):
         show_bgrimg(image)
         for img in imgs:
             show_bgrimg(img)
-            recog, img = inference(img, model)
+            pred_gray, img_gray = inference(img, models[0], 1)
+            pred_color, img_color = inference(img, models[1], 3)
+            pred = pred_gray + pred_color
+            recog = np.argmax(pred)
             print([
                 '!!!   1円 表 !!!', '!!!   1円　裏 !!!',
                 '!!!   5円 表 !!!', '!!!   5円　裏 !!!',
@@ -41,8 +46,8 @@ def demo(model, dirname):
 
 
 def main():
-    model = load_model()
-    demo(model, '0001')
+    models = load_model()
+    demo(models, '0001')
 
 
 if __name__ == '__main__':

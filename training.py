@@ -13,9 +13,7 @@ import numpy as np
 import cv2
 
 
-def load_data(dirname):
-    IN_CHANNELS = 1
-
+def load_data(dirname, in_channels):
     dirs = ['001_00', '001_01',
             '005_00', '005_01',
             '010_00', '010_01',
@@ -27,7 +25,7 @@ def load_data(dirname):
     for i, dir in enumerate(dirs):
         for r, ds, fs in os.walk(os.path.join(dirname, dir)):
             count += len(fs)
-    xs = np.zeros((count, IN_CHANNELS, IMAGE_SIZE[0], IMAGE_SIZE[1])).astype(
+    xs = np.zeros((count, in_channels, IMAGE_SIZE[0], IMAGE_SIZE[1])).astype(
         np.float32)
     ys = np.zeros(count).astype(np.int32)
 
@@ -38,15 +36,15 @@ def load_data(dirname):
                 filename = os.path.join(r, f)
                 img = cv2.imread(filename)
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                if IN_CHANNELS == 1:
+                if in_channels == 1:
                     img = normalize_image(img)
                     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
                 else:
-                    img = normalize_image(img)
+                    img = adjust_gamma(img)
                 img = cv2.resize(img, IMAGE_SIZE)
                 img = img / 255
                 im = img.astype(np.float32).reshape(
-                    IMAGE_SIZE[0], IMAGE_SIZE[1], IN_CHANNELS).transpose(2, 0, 1)
+                    IMAGE_SIZE[0], IMAGE_SIZE[1], in_channels).transpose(2, 0, 1)
                 xs[idx] = im
                 ys[idx] = i
                 idx += 1
@@ -66,14 +64,15 @@ def main():
     if os.path.isfile(optfile):
         serializers.load_npz(optfile, optimizer)
 
-    train = load_data('./image/train')
-    test = load_data('./image/test')
+    IN_CHANNELS = 3
+    train = load_data('./image/train', IN_CHANNELS)
+    test = load_data('./image/test', IN_CHANNELS)
     train_iter = chainer.iterators.SerialIterator(train, batch_size=100)
     test_iter = chainer.iterators.SerialIterator(
         test, batch_size=100, repeat=False, shuffle=False)
 
     updater = training.StandardUpdater(train_iter, optimizer, device=None)
-    trainer = training.Trainer(updater, (30, 'epoch'), out='result')
+    trainer = training.Trainer(updater, (2, 'epoch'), out='result')
     trainer.extend(extensions.Evaluator(test_iter, model, device=None))
     trainer.extend(extensions.LogReport())
     trainer.extend(extensions.PrintReport(
