@@ -1,12 +1,14 @@
 import os
-import os.path
+import sys
+from model import Alex
 import chainer.links as L
 from chainer import serializers
-from model import Alex
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn
 from inference import inference
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../utility/'))
 from image import clip_coin, show_bgrimg
 
 
@@ -20,7 +22,7 @@ def load_model():
 
 
 def demo(models, dirname):
-    root = os.path.join('./sample/', dirname)
+    root = os.path.join('../sample/', dirname)
     for f in os.listdir(root):
         filename = os.path.join(root, f)
         if not os.path.isfile:

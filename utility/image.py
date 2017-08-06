@@ -1,9 +1,9 @@
 import os
 import time
 import shutil
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 
 IMAGE_SIZE = (160, 160)
@@ -232,7 +232,7 @@ def rename(root):
 
 
 def create_sample_img():
-    root = './image/org/'
+    root = '../image/org/'
     for d in os.listdir(root):
         dirname = os.path.join(root, d)
         if os.path.isdir(dirname):

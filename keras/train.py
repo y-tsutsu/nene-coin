@@ -1,14 +1,16 @@
-from image import adjust_gamma, normalize_image, IMAGE_SIZE
 import os
-import os.path
-import numpy as np
-import cv2
+import sys
 from keras.initializers import TruncatedNormal, Constant
 from keras.models import Sequential
 from keras.optimizers import SGD
 from keras.layers import Input, Dropout, Flatten, Conv2D, MaxPooling2D, Dense, Activation, BatchNormalization
 from keras.callbacks import Callback, EarlyStopping, ModelCheckpoint
 from keras.utils.np_utils import to_categorical
+import numpy as np
+import cv2
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../utility/'))
+from image import adjust_gamma, normalize_image, IMAGE_SIZE
 
 
 def load_data(dirname, in_channels):
@@ -122,7 +124,7 @@ def main():
     check = ModelCheckpoint('./model/model.hdf5')
     early_stopping = EarlyStopping(
         monitor='val_loss', patience=3, verbose=1, mode='auto')
-    history = model.fit(train[0], train[1], epochs=15, batch_size=100,
+    history = model.fit(train[0], train[1], epochs=3, batch_size=100,
                         shuffle=True, validation_split=0.25, callbacks=[early_stopping])
 
 

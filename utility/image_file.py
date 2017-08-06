@@ -1,12 +1,12 @@
 import os
 import shutil
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from image import show_bgrimg, show_grayimg, IMAGE_SIZE
 from increase_picture import increase_picture
+import cv2
 
-path = './image/origin/100_01/'
+path = '../image/origin/100_01/'
 
 
 def convert_png(dirname):
@@ -80,8 +80,8 @@ def increase_img(dirname):
 
 
 def main():
-    rotate_img('./image/train/')
-    rotate_img('./image/test/')
+    rotate_img('../image/train/')
+    rotate_img('../image/test/')
 
 
 if __name__ == '__main__':

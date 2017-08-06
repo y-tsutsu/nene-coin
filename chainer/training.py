@@ -1,5 +1,6 @@
+import os
+import sys
 from model import Alex
-from image import adjust_gamma, normalize_image, IMAGE_SIZE
 import chainer
 import chainer.function as F
 import chainer.links as L
@@ -7,10 +8,11 @@ from chainer import training
 from chainer import serializers
 from chainer.datasets import tuple_dataset
 from chainer.training import extensions
-import os
-import os.path
 import numpy as np
 import cv2
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../utility/'))
+from image import adjust_gamma, normalize_image, IMAGE_SIZE
 
 
 def load_data(dirname, in_channels):
@@ -54,25 +56,27 @@ def load_data(dirname, in_channels):
 
 def main():
     model = L.Classifier(Alex())
-    modelfile = './model/model.npz'
+
+    modeldir = './model'
+    modelfile = os.path.join(modeldir, 'model.npz')
     if os.path.isfile(modelfile):
         serializers.load_npz(modelfile, model)
 
     optimizer = chainer.optimizers.Adam()
     optimizer.setup(model)
-    optfile = './model/optimizer.npz'
+    optfile = os.path.join(modeldir, 'optimizer.npz')
     if os.path.isfile(optfile):
         serializers.load_npz(optfile, optimizer)
 
     IN_CHANNELS = 3
-    train = load_data('./image/train', IN_CHANNELS)
-    test = load_data('./image/test', IN_CHANNELS)
+    train = load_data('../image/train', IN_CHANNELS)
+    test = load_data('../image/test', IN_CHANNELS)
     train_iter = chainer.iterators.SerialIterator(train, batch_size=100)
     test_iter = chainer.iterators.SerialIterator(
         test, batch_size=100, repeat=False, shuffle=False)
 
     updater = training.StandardUpdater(train_iter, optimizer, device=None)
-    trainer = training.Trainer(updater, (2, 'epoch'), out='result')
+    trainer = training.Trainer(updater, (30, 'epoch'), out='result')
     trainer.extend(extensions.Evaluator(test_iter, model, device=None))
     trainer.extend(extensions.LogReport())
     trainer.extend(extensions.PrintReport(
@@ -81,11 +85,10 @@ def main():
 
     trainer.run()
 
-    modeldir = './model'
     if not os.path.isdir(modeldir):
         os.mkdir(modeldir)
-    serializers.save_npz(os.path.join(modeldir, 'model.npz'), model)
-    serializers.save_npz(os.path.join(modeldir, 'optimizer.npz'), optimizer)
+    serializers.save_npz(modelfile, model)
+    serializers.save_npz(optfile, optimizer)
 
 
 if __name__ == '__main__':

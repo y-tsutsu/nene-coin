@@ -1,6 +1,6 @@
-import os.path
+import os
+import sys
 from model import Alex
-from image import clip_coin, adjust_gamma, normalize_image, show_bgrimg, IMAGE_SIZE
 import chainer.links as L
 from chainer import serializers
 from chainer import Variable
@@ -8,6 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn
 import cv2
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../utility/'))
+from image import clip_coin, adjust_gamma, normalize_image, show_bgrimg, IMAGE_SIZE
 
 
 def softmax(a):
@@ -42,7 +45,7 @@ def main():
     serializers.load_npz('./model/model.npz', model)
     IN_CHANNELS = 3
 
-    for r, ds, fs in os.walk('./sample/0001/'):
+    for r, ds, fs in os.walk('../sample/0001/'):
         for f in fs:
             filename = os.path.join(r, f)
             image, imgs = clip_coin(filename)
