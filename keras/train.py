@@ -39,7 +39,9 @@ def load_data(dirname, in_channels):
                     img = adjust_gamma(img)
                 img = cv2.resize(img, IMAGE_SIZE)
                 img = img / 255
-                xs[idx] = img
+                im = img.astype(np.float32).reshape(
+                    IMAGE_SIZE[0], IMAGE_SIZE[1], in_channels)
+                xs[idx] = im
                 label = np.zeros(len(dirs)).astype(np.int32)
                 label[i] = 1
                 ys[idx] = label
@@ -49,14 +51,14 @@ def load_data(dirname, in_channels):
 
 
 def main():
-    model = get_model()
+    IN_CHANNELS = 3
+    model = get_model(IN_CHANNELS)
 
     modeldir = './model'
     modelfile = os.path.join(modeldir, 'model.hdf5')
     if os.path.isfile(modelfile):
         model.load_weights(modelfile)
 
-    IN_CHANNELS = 3
     train = load_data('../image/train', IN_CHANNELS)
     test = load_data('../image/test', IN_CHANNELS)
 

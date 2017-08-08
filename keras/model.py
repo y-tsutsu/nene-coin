@@ -36,12 +36,12 @@ def dense(units, **kwargs):
     )
 
 
-def get_model():
+def get_model(in_channels):
     model = Sequential()
 
     # 第1畳み込み層
-    model.add(conv2d(96, 11, strides=(4, 4),
-                     bias_init=0, input_shape=(IMAGE_SIZE[0], IMAGE_SIZE[1], 3)))
+    model.add(conv2d(96, 11, strides=(4, 4), bias_init=0,
+                     input_shape=(IMAGE_SIZE[0], IMAGE_SIZE[1], in_channels)))
     model.add(MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
     model.add(BatchNormalization())
 
