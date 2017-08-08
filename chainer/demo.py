@@ -6,7 +6,7 @@ from chainer import serializers
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn
-from inference import inference
+from predict import predict
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../utility/'))
 from image import clip_coin, show_bgrimg
@@ -34,8 +34,8 @@ def demo(models, dirname):
         show_bgrimg(image)
         for img in imgs:
             show_bgrimg(img)
-            pred_gray, img_gray = inference(img, models[0], 1)
-            pred_color, img_color = inference(img, models[1], 3)
+            pred_gray, img_gray = predict(img, models[0], 1)
+            pred_color, img_color = predict(img, models[1], 3)
             recog_gray = np.argmax(pred_gray)
             recog_color = np.argmax(pred_color)
             title = ['  1円 表', '  1円　裏', '  5円 表', '  5円　裏', ' 10円 表', ' 10円　裏',

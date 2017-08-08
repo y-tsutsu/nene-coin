@@ -21,7 +21,7 @@ def softmax(a):
     return y
 
 
-def inference(img, model, in_channels):
+def predict(img, model, in_channels):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     if in_channels == 1:
         img = normalize_image(img)
@@ -56,7 +56,7 @@ def main():
                 if 12 < count:
                     break
                 plt.subplot(3, 4, count)
-                pred, img_ = inference(img, model, IN_CHANNELS)
+                pred, img_ = predict(img, model, IN_CHANNELS)
                 recog = np.argmax(pred)
                 plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 plt.title([
