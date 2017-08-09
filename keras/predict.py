@@ -32,7 +32,6 @@ def predict(img, model, in_channels):
         1, IMAGE_SIZE[0], IMAGE_SIZE[1], in_channels)
     y = model.predict([im])
     [pred] = y
-    print(pred.shape)
     pred = softmax(pred)
     print(('[{:.5f} {:.5f}]  ' * (len(pred) // 2)).format(*pred))
     return pred, img

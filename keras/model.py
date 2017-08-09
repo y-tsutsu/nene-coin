@@ -37,6 +37,8 @@ def dense(units, **kwargs):
 
 
 def get_model(in_channels):
+    CLASSES = 12
+
     model = Sequential()
 
     # 第1畳み込み層
@@ -45,12 +47,12 @@ def get_model(in_channels):
     model.add(MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
     model.add(BatchNormalization())
 
-    # 第２畳み込み層
+    # 第2畳み込み層
     model.add(conv2d(256, 5, bias_init=1))
     model.add(MaxPooling2D(pool_size=(3, 3), strides=(2, 2)))
     model.add(BatchNormalization())
 
-    # 第３~5畳み込み層
+    # 第3~5畳み込み層
     model.add(conv2d(384, 3, bias_init=0))
     model.add(conv2d(384, 3, bias_init=1))
     model.add(conv2d(256, 3, bias_init=1))
@@ -65,7 +67,7 @@ def get_model(in_channels):
     model.add(Dropout(0.5))
 
     # 読み出し層
-    model.add(Dense(12, activation='softmax'))
+    model.add(Dense(CLASSES, activation='softmax'))
 
     model.compile(optimizer=SGD(lr=0.01),
                   loss='categorical_crossentropy', metrics=['accuracy'])
