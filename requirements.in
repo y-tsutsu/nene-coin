@@ -1,0 +1,10 @@
+chainer
+h5py
+jupyter
+keras
+matplotlib
+numpy
+opencv-python
+scipy
+seaborn
+tensorflow
